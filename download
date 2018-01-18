@@ -32,3 +32,5 @@ parse_file() {
 }
 
 "$here"/scripts/all-dates | fetch_cache | parse_file > result
+cat result | awk -F, '{print $4}' | sort | uniq > horse
+cat result | awk -F, '{print $5}' | sort | uniq > driver
