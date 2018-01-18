@@ -8,7 +8,6 @@ mkdir -p result .cache
 
 fetch_cache() {
   while read date; do
-    mkdir -p ".cache"
     cache=".cache/$(echo $date | tr '/' '_')"
     if ! [[ -f "$cache" ]]; then
       echo "Downloading $cache" >&2
