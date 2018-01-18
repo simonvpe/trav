@@ -6,19 +6,23 @@ here="$(dirname "$0")"
 
 mkdir -p result .cache
 
-parse() {
-  d=""
+fetch_cache() {
   while read date; do
-    filename="result/$(echo $date | tr '/' '_')"
+    mkdir -p ".cache"
     cache=".cache/$(echo $date | tr '/' '_')"
-    if [[ -f "$cache" ]]; then
-      cat "$cache"
-    else
-      echo "Downloading $filename" >&2
-      "$here"/scripts/fetch $date 2>/dev/null | tee "$cache"
-    fi | "$here"/scripts/parse > "$filename"
-    [[ "0" != "$(wc -l "$filename")" ]]
+    if ! [[ -f "$cache" ]]; then
+      echo "Downloading $cache" >&2
+      "$here"/scripts/fetch $date 2>/dev/null > "$cache"
+    fi
+    echo "$cache"
   done	
 }
 
-"$here"/scripts/missing-dates | parse
+parse_html() {
+  while read html; do
+    out="$(echo "$html" | sed -s 's/^\.cache/result/')"
+    cat "$html" | "$here"/scripts/parse > "$out"
+  done	
+}
+
+"$here"/scripts/missing-dates | fetch_cache | parse_html
