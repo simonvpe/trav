@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+here="$(dirname "$0")"
+
+mkdir -p result .cache
+
+parse() {
+  d=""
+  while read date; do
+    filename="result/$(echo $date | tr '/' '_')"
+    cache=".cache/$(echo $date | tr '/' '_')"
+    if [[ -f "$cache" ]]; then
+      cat "$cache"
+    else
+      echo "Downloading $filename" >&2
+      "$here"/scripts/fetch $date 2>/dev/null | tee "$cache"
+    fi | "$here"/scripts/parse > "$filename"
+    [[ "0" != "$(wc -l "$filename")" ]]
+  done	
+}
+
+"$here"/scripts/missing-dates | parse

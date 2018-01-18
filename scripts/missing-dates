@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+here="$(dirname "$0")"
+
+filter_dates() {
+  while read line; do
+    [[ -f "result/$(echo "$line" | tr '/' '_')" ]] || echo $line
+  done
+}
+
+"$here"/all-dates | filter_dates
