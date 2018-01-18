@@ -4,7 +4,8 @@ set -euo pipefail
 
 here="$(dirname "$0")"
 
-mkdir -p result .cache
+rm -rf result
+mkdir -p .cache
 
 fetch_cache() {
   while read date; do
@@ -17,11 +18,17 @@ fetch_cache() {
   done	
 }
 
-parse_html() {
-  while read html; do
-    out="$(echo "$html" | sed -s 's/^\.cache/result/')"
-    cat "$html" | "$here"/scripts/parse > "$out"
+add_date() {
+  while read line; do
+    echo $line | sed "s/^/$1, /"
+  done
+}
+
+parse_file() {
+  while read file; do
+    date="$(echo $file | sed 's/^.cache\///' | awk -F'_' '{printf "%s-%s-%s", $3, $1, $2}')"
+    cat "$file" | "$here"/scripts/parse | add_date "$date" | sort -k1 -t, -n
   done	
 }
 
-"$here"/scripts/missing-dates | fetch_cache | parse_html
+"$here"/scripts/all-dates | fetch_cache | parse_file > result
