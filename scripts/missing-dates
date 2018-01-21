@@ -6,7 +6,8 @@ here="$(dirname "$0")"
 
 filter_dates() {
   while read line; do
-    [[ -f "result/$(echo "$line" | tr '/' '_')" ]] || echo $line
+    date="$(echo $line | sed 's/^.cache\///' | awk -F'/' '{printf "%s-%s-%s", $3, $1, $2}')"
+    find result/${date}* &>/dev/null || echo $line
   done
 }
 

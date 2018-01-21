@@ -4,12 +4,11 @@ set -euo pipefail
 
 here="$(dirname "$0")"
 
-rm -rf result
-mkdir -p .cache
+mkdir -p .cache result
 
 fetch_cache() {
   while read date; do
-    cache=".cache/$(echo $date | tr '/' '_')"
+    cache=".cache/`echo $date | tr '/' '_'`"
     if ! [[ -f "$cache" ]]; then
       echo "Downloading $cache" >&2
       "$here"/scripts/fetch $date 2>/dev/null > "$cache"
@@ -18,7 +17,7 @@ fetch_cache() {
   done	
 }
 
-add_date() {
+prepend_column() {
   while read line; do
     echo $line | sed "s/^/$1, /"
   done
@@ -26,11 +25,18 @@ add_date() {
 
 parse_file() {
   while read file; do
-    date="$(echo $file | sed 's/^.cache\///' | awk -F'_' '{printf "%s-%s-%s", $3, $1, $2}')"
-    cat "$file" | "$here"/scripts/parse | add_date "$date" | sort -k1 -t, -n
+    date="`echo $file | sed 's/^.cache\///' | awk -F'_' '{printf "%s-%s-%s", $3, $1, $2}'`"
+    cat "$file" | "$here"/scripts/parse | prepend_column "$date" | sort -k1 -t, -n
   done	
 }
 
-"$here"/scripts/all-dates | fetch_cache | parse_file > result
-cat result | awk -F, '{print $4}' | sort | uniq > horse
-cat result | awk -F, '{print $5}' | sort | uniq > driver
+write() {
+  prev=""
+  while read line; do
+    date=`echo $line | cut -d, -f1`
+    race=`echo $line | cut -d, -f2 | md5sum`
+    echo "$line" >> "result/$date-${race:0:6}"
+  done
+}
+
+"$here"/scripts/missing-dates | fetch_cache | parse_file | write
