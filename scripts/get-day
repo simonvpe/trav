@@ -1,0 +1,11 @@
+#!/usr/bin/env python3
+
+import atg, fileinput, json
+from dateparser import parse
+
+for date in fileinput.input():
+  data = atg.get_day(parse(date))
+  out = json.dumps(data)
+  print(out)
+
+

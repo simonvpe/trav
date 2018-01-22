@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-set -euo pipefail
-
-date=$1
-
-url="https://www.stableeye.se/Home/Result?date=$date"
-curl -vs "$url"

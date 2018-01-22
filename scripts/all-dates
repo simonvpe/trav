@@ -2,10 +2,10 @@
 
 import datetime as dt
 
-t0 = dt.datetime(2015, 3, 1)
+t0 = dt.datetime(2011, 5, 1)
 t1 = dt.datetime(*dt.datetime.now().timetuple()[:3])
 
 while t0 < t1:
-  print(t0.strftime('%m/%d/%Y'))
+  print(t0.strftime('%Y-%m-%d'))
   t0 += dt.timedelta(days=1)
 

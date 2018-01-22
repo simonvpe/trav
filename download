@@ -4,39 +4,6 @@ set -euo pipefail
 
 here="$(dirname "$0")"
 
-mkdir -p .cache result
+mkdir -p .cache/{days,games,races}
 
-fetch_cache() {
-  while read date; do
-    cache=".cache/`echo $date | tr '/' '_'`"
-    if ! [[ -f "$cache" ]]; then
-      echo "Downloading $cache" >&2
-      "$here"/scripts/fetch $date 2>/dev/null > "$cache"
-    fi
-    echo "$cache"
-  done	
-}
-
-prepend_column() {
-  while read line; do
-    echo $line | sed "s/^/$1, /"
-  done
-}
-
-parse_file() {
-  while read file; do
-    date="`echo $file | sed 's/^.cache\///' | awk -F'_' '{printf "%s-%s-%s", $3, $1, $2}'`"
-    cat "$file" | "$here"/scripts/parse | prepend_column "$date" | sort -k1 -t, -n
-  done	
-}
-
-write() {
-  prev=""
-  while read line; do
-    date=`echo $line | cut -d, -f1`
-    race=`echo $line | cut -d, -f2 | md5sum`
-    echo "$line" >> "result/$date-${race:0:6}"
-  done
-}
-
-"$here"/scripts/missing-dates | fetch_cache | parse_file | write
+"$here"/scripts/missing-dates | "$here"/scripts/get-day | "$here"/scripts/get-races

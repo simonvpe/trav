@@ -5,9 +5,8 @@ set -euo pipefail
 here="$(dirname "$0")"
 
 filter_dates() {
-  while read line; do
-    date="$(echo $line | sed 's/^.cache\///' | awk -F'/' '{printf "%s-%s-%s", $3, $1, $2}')"
-    find result/${date}* &>/dev/null || echo $line
+  while read date; do
+    [[ -f "days/${date}.json" ]] || echo "$date"
   done
 }
 

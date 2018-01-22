@@ -1,0 +1,14 @@
+#!/usr/bin/env python3
+
+import atg, fileinput, json
+
+races = set()
+
+for day in fileinput.input():
+  data = json.loads(day)
+  for game_key, game_value in data['games'].items():
+      for race in game_value[0]['races']:
+          races.add(race)
+          
+for race in races: print(json.dumps(atg.get_race(race)))
+
