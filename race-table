@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+find .cache/races -type f | sort \
+    | xargs jq 'select(.track.countryCode == "SE" and .status == "results")' \
+    | jq '{ 
+            (.id): [
+              .starts[] | {
+                horse_id: .horse.id, 
+                horse_name: .horse.name,
+                driver_id: .driver.id, 
+                driver_name: (.driver.firstName + " " + .driver.lastName),
+                place: .result.place, 
+                finishOrder: .result.finishOrder
+              }
+            ]
+          }' \
+              | jq -s add
