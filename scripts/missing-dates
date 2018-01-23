@@ -6,7 +6,9 @@ here="$(dirname "$0")"
 
 filter_dates() {
   while read date; do
-    [[ -f "days/${date}.json" ]] || echo "$date"
+      [[ -f ".cache/days/${date}.json" ]] \
+	  || ! find ".cache/races" -name "${date}_*" &>/dev/null \
+	  || echo "$date"
   done
 }
 
