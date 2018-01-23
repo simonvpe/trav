@@ -6,8 +6,9 @@ races = set()
 
 for day in fileinput.input():
   data = json.loads(day)
-  for game_key, game_value in data['games'].items():
-      for race in game_value[0]['races']:
+  for game_key, game_list in data['games'].items():
+    for game in game_list:
+      for race in game['races']:
           races.add(race)
           
 for race in races: print(json.dumps(atg.get_race(race)))

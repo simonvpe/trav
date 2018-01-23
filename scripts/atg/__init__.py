@@ -14,7 +14,7 @@ def get_obj(url):
 
 def cache_get_obj(url, filename):
   try:
-    return open(filename, 'r').read()
+    return json.loads(open(filename, 'r').read())
   except:
     data = get_obj(url)
     open(filename, 'w').write(json.dumps(data))

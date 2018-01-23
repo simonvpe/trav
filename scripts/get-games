@@ -1,0 +1,17 @@
+#!/usr/bin/env python3
+
+import atg, fileinput, json
+
+games = set()
+
+for day in fileinput.input():
+  data = json.loads(day)
+  for game_key, game_list in data['games'].items():
+    for game in game_list:
+      try:
+        games.add(game['id'])
+      except:
+        pass
+        
+for game in games: print(json.dumps(atg.get_game(game)))
+

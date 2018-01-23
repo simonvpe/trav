@@ -3,7 +3,20 @@
 set -euo pipefail
 
 here="$(dirname "$0")"
+dates=${1:-all}
 
 mkdir -p .cache/{days,games,races}
 
-"$here"/scripts/missing-dates | "$here"/scripts/get-day | "$here"/scripts/get-races
+dates() {
+  if [[ "$dates" == "all" ]]; then
+      "$here"/scripts/all-dates
+  elif [[ "$dates" == "missing" ]]; then
+      "$here"/scripts/missing-dates
+  else
+      echo "Bad argument $dates" >&2
+      exit 1
+  fi
+}
+
+dates | "$here"/scripts/get-day | "$here"/scripts/get-games
+dates | "$here"/scripts/get-day | "$here"/scripts/get-races
