@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Filters on Swedish races where status == results. Then collects the interesting
+# values for each race file and outputs a long json dictionary with all the races/values.
+
 find .cache/races -type f | sort \
     | xargs jq 'select(.track.countryCode == "SE" and .status == "results")' \
     | jq '{ 
