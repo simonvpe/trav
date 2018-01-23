@@ -18,5 +18,5 @@ dates() {
   fi
 }
 
-dates | "$here"/scripts/get-day | "$here"/scripts/get-games
-dates | "$here"/scripts/get-day | "$here"/scripts/get-races
+dates | "$here"/scripts/get-day | "$here"/scripts/get-games >/dev/null
+dates | "$here"/scripts/get-day | "$here"/scripts/get-races >/dev/null
