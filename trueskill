@@ -10,11 +10,11 @@ horse_rating = defaultdict(lambda: Rating())
 driver_rating = defaultdict(lambda: Rating())
 
 def rate(race):
-    horse_id = [x['horse_id'] for x in race]
-    driver_id = [x['driver_id'] for x in race]
-    rating = zip([horse_rating[x] for x in horse_id],
-                 [driver_rating[x] for x in driver_id])
-    rank = [x['finishOrder'] for x in race]
+    rating = {
+        'horse':  [horse_rating[x] for x in race['horseId']],
+        'driver': [driver_rating[x] for x in race['driverId']]
+    }
+    rank = race['finishOrder']
 
     # Can't handle None ranks. This can fail if no ranks
     # are available
@@ -25,25 +25,22 @@ def rate(race):
         return None
         
     # Get the previous skill ratings and inject into race
-    for carriage in race:
-        horse = horse_rating[carriage['horse_id']]
-        carriage['horse_mu'] = horse.mu
-        carriage['horse_sigma'] = horse.sigma
-
-        driver = driver_rating[carriage['driver_id']]
-        carriage['driver_mu'] = driver.mu
-        carriage['driver_sigma'] = driver.sigma
+    race['horseMu'] = [x.mu for x in rating['horse']]
+    race['horseSigma'] = [x.sigma for x in rating['horse']]
+    race['driverMu'] = [x.mu for x in rating['driver']]
+    race['driverSigma'] = [x.sigma for x in rating['driver']]
 
     # Then update the ratings before the next race
-    rating = trueskill.rate(list(rating), rank)
-    for row in zip(horse_id, driver_id, rating):
+    rating = trueskill.rate(list(zip(rating['horse'],rating['driver'])), rank)
+    for row in zip(race['horseId'], race['driverId'], rating):
         horse_rating[row[0]] = row[2][0]
         driver_rating[row[1]] = row[2][1]
         
     return race
 
 
-result = [rate(race) for id, race in data.items()]
-print(json.dumps(list(filter(lambda x: x != None, result))))
+# Data is assumed to be sorted in chronological order
+result = [rate(race) for race in data]
+print(json.dumps([x for x in filter(lambda x: x != None, result)]))
 
 

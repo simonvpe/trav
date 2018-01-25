@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+
+import json
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+data = pd.Panel({x['startTime']: x for x in json.loads(open('trueskill.out','r').read())})
+data.items = pd.to_datetime(data.items)
+
+def plot_skill(horse_id):
+    plt.plot(data.loc[:,:,'horseMu'] \
+        .where(data.loc[:,:,'horseId'] == horse_id) \
+        .transpose().max(axis=1).dropna())
+
+# plot_skill(725040)
+# plot_skill(730909)
+# plot_skill(691661)
+# plot_skill(731159)
+# plot_skill(723965)
+# plot_skill(725147)
+# plot_skill(695529)
+# plot_skill(712730)
+# plot_skill(720725)
+# plot_skill(72973)
+
+# plt.show()
+
+# shape (samples,max_participants,(mu,sigma))
+horse = np.nan_to_num(np.array(list(zip(data[:,:,'horseMu'].as_matrix(), data[:,:,'horseSigma'].as_matrix())), dtype='float').transpose((2,0,1)))
+
+# shape (samples,max_participants,(mu,sigma))
+driver = np.nan_to_num(np.array(list(zip(data[:,:,'driverMu'].as_matrix(), data[:,:,'driverSigma'].as_matrix())), dtype='float').transpose((2,0,1)))
+
+# shape (samples,max_participants)
+winner = np.array(np.array(list(zip(data[:,:,'finishOrder'].as_matrix()))) == 1, dtype='int').squeeze().transpose()
