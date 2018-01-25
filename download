@@ -19,5 +19,4 @@ dates() {
 }
 
 dates | "$here"/scripts/get-day | pv -c -l -N Day \
-      | tee >("$here"/scripts/get-games | pv -c -l -N Games >/dev/null) \
       | "$here"/scripts/get-races | pv -c -l -N Races >/dev/null
