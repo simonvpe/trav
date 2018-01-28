@@ -1,0 +1,24 @@
+#!/usr/bin/env python
+
+
+import fileinput, json
+import numpy as np
+import more_itertools as mit
+
+def read_data():
+    # Reads the input and resizes each race so that they all have
+    # the same shape
+    raw = json.loads(u"".join([x for x in fileinput.input()]))
+    max_len = 0
+    for race in raw: max_len = max(len(race[0]), max_len)
+    return [
+        [
+            list(mit.padded(x[0],0,max_len)),
+            list(mit.padded(x[1],0,max_len)),
+            list(mit.padded(x[2],0,max_len))
+        ] for x in raw
+    ]
+
+data = read_data()
+print(np.shape(data))
+print(data[0])
