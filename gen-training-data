@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+
+import fileinput, json, random
+import numpy as np
+import pandas as pd
+
+# From each race, draw n samples from the skill distributions of ecah horse and driver
+# and generate a traning sample. 15 was chosen because it yields about 900k samples, so
+# pretty arbitrary.
+n = 25
+
+def mutate(race, n):
+    return [[
+        np.random.normal(race['horseMu'], race['horseSigma']).tolist(),
+        np.random.normal(race['driverMu'], race['driverSigma']).tolist(),
+        np.array(np.array(race['finishOrder']) == 1, dtype='int').tolist()
+    ] for x in range(n)]
+
+data = json.loads(u"".join([x for x in fileinput.input()]))
+result = []
+for race in data: result += mutate(race, n)
+values = pd.DataFrame.from_records(result).fillna(0).sample(frac=1).reset_index(drop=True)
+print(values.to_json())
+

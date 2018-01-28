@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
 
-import json, urllib.request
+import json, pycurl
 from datetime import datetime
+from io import BytesIO
 
 def get_obj(url):
-  request = urllib.request.Request(url, None, {
-    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:57.0) Gecko/20100101 Firefox/57.0',
-    'Accept': 'application/json, text/javascript, */*; q=0.01',
-    'Accept-Language': 'en-US,en;q=0.5'
-  })
-  text = urllib.request.urlopen(request).read()
-  return json.loads(text)
+  buffer = BytesIO()
+  c = pycurl.Curl()
+  c.setopt(c.URL, url)
+  c.setopt(c.WRITEFUNCTION, buffer.write)
+  c.setopt(c.USERAGENT, 'Mozilla/5.0 (X11; Linux x86_64; rv:57.0) Gecko/20100101 Firefox/57.0')
+  c.setopt(c.HTTPHEADER, ('Accept:','application/json'))
+  c.perform()
+  c.close()
+  return json.loads(buffer.getvalue())
 
 def cache_get_obj(url, filename):
   try:
