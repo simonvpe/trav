@@ -5,20 +5,43 @@ import fileinput, json
 import numpy as np
 import more_itertools as mit
 
+from keras.models import Sequential
+from keras.layers import Dense, Activation
+
 def read_data():
     # Reads the input and resizes each race so that they all have
     # the same shape
     raw = json.loads(u"".join([x for x in fileinput.input()]))
     max_len = 0
     for race in raw: max_len = max(len(race[0]), max_len)
-    return [
+    return np.array([
         [
             list(mit.padded(x[0],0,max_len)),
             list(mit.padded(x[1],0,max_len)),
             list(mit.padded(x[2],0,max_len))
         ] for x in raw
-    ]
+    ])
 
 data = read_data()
-print(np.shape(data))
-print(data[0])
+
+X = data[:,:-1,:]
+X = X.reshape(np.shape(X)[0], 30)
+
+Y = data[:,-1,:]
+
+print("X shape %s" % str(np.shape(X)))
+print("Y shape %s" % str(np.shape(Y)))
+
+model = Sequential([
+    Dense(30, input_dim=30),
+    Activation('relu'),
+    Dense(60),
+    Activation('relu'),
+    Dense(15),
+    Activation('softmax')
+])
+model.compile(optimizer='rmsprop',
+              loss='categorical_crossentropy',
+              metrics=['accuracy'])
+
+model.fit(X,Y,epochs=10,batch_size=32)
