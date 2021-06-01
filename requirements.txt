@@ -20,4 +20,4 @@ SecretStorage==2.3.1
 six==1.11.0
 tzlocal==1.5.1
 unattended-upgrades==0.1
-urllib3==1.19.1
+urllib3==1.26.5
